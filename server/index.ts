@@ -1,8 +1,13 @@
 import type * as Party from 'partykit/server';
+
 export default class Server implements Party.Server {
 	count = 0;
 	connections = new Map();
 	maxEnergyLevel = 10;
+
+	options: Party.ServerOptions = {
+		hibernate: true,
+	};
 
 	constructor(readonly party: Party.Party) {}
 
@@ -15,7 +20,7 @@ export default class Server implements Party.Server {
 			Math.min((this.connections.size / this.maxEnergyLevel) * 100, 100) + '%';
 		this.connections.set(connection.id, percent);
 
-		this.count = [...this.party.getConnections()].length;
+		this.count = this.connections.size;
 		this.party.broadcast(
 			JSON.stringify({
 				count: this.count,
@@ -29,7 +34,7 @@ export default class Server implements Party.Server {
 	onClose(connection: Party.Connection) {
 		this.connections.delete(connection.id);
 
-		this.count = [...this.party.getConnections()].length;
+		this.count = this.connections.size;
 		this.party.broadcast(
 			JSON.stringify({
 				count: this.count,
