@@ -16,7 +16,7 @@
 		</section>
 
 		<template id="thingy">
-			<div class="thingy"></div>
+			<div class="thingy" transition:name="thingy"></div>
 		</template>
 	</body>
 </html>
@@ -44,22 +44,22 @@
 
 		if (msg.type === 'join') {
 			console.log(msg.connections);
-			msg.connections.forEach((id: string) => {
-				const elExists = document.querySelector(`[data-id="${id}"]`);
-				console.log(elExists);
+			msg.connections.forEach(
+				([id, percent]: [id: string, percent: string]) => {
+					const elExists = document.querySelector(`[data-id="${id}"]`);
 
-				if (!elExists) {
-					const thingy = template.content.firstElementChild!.cloneNode(
-						true,
-					) as HTMLDivElement;
+					if (!elExists) {
+						const thingy = template.content.firstElementChild!.cloneNode(
+							true,
+						) as HTMLDivElement;
 
-					thingy.dataset.id = id;
+						thingy.dataset.id = id;
 
-					const mixPercent = Math.min((msg.count / 10) * 100, 100) + '%';
-					thingy.style.setProperty('--color-mix-percent', mixPercent);
-					heroEl?.appendChild(thingy);
-				}
-			});
+						thingy.style.setProperty('--color-mix-percent', percent);
+						heroEl?.appendChild(thingy);
+					}
+				},
+			);
 		}
 
 		if (msg.type === 'leave') {

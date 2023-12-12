@@ -1,7 +1,8 @@
 import type * as Party from 'partykit/server';
 export default class Server implements Party.Server {
 	count = 0;
-	connIds = new Set();
+	connections = new Map();
+	maxEnergyLevel = 10;
 
 	constructor(readonly party: Party.Party) {}
 
@@ -10,17 +11,15 @@ export default class Server implements Party.Server {
 	}
 
 	onConnect(connection: Party.Connection) {
-		for (const conn of this.party.getConnections()) {
-			this.connIds.add(conn.id);
-		}
+		const percent =
+			Math.min((this.connections.size / this.maxEnergyLevel) * 100, 100) + '%';
+		this.connections.set(connection.id, percent);
 
-		console.log(connection.id);
-		console.log([...this.connIds.values()]);
 		this.count = [...this.party.getConnections()].length;
 		this.party.broadcast(
 			JSON.stringify({
 				count: this.count,
-				connections: [...this.connIds.values()],
+				connections: [...this.connections.entries()],
 				id: connection.id,
 				type: 'join',
 			}),
@@ -28,7 +27,7 @@ export default class Server implements Party.Server {
 	}
 
 	onClose(connection: Party.Connection) {
-		this.connIds.delete(connection.id);
+		this.connections.delete(connection.id);
 
 		this.count = [...this.party.getConnections()].length;
 		this.party.broadcast(
