@@ -43,7 +43,6 @@
 		counter.innerText = msg.count;
 
 		if (msg.type === 'join') {
-			console.log(msg.connections);
 			msg.connections.forEach(
 				([id, percent]: [id: string, percent: string]) => {
 					const elExists = document.querySelector(`[data-id="${id}"]`);
