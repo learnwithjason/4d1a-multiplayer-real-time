@@ -1,0 +1,40 @@
+---
+
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Astro</title>
+	</head>
+	<body>
+		<h1>Astro</h1>
+
+		<p>There are <span id="connection-count">1</span> connected users.</p>
+	</body>
+</html>
+
+<script>
+	import PartySocket from 'partysocket';
+
+	const partySocket = new PartySocket({
+		host: 'localhost:1999',
+		room: '4d1a',
+	});
+
+	partySocket.send('test test');
+
+	// partySocket.
+
+	partySocket.addEventListener('message', (e) => {
+		const msg = JSON.parse(e.data);
+
+		if (msg.connCount) {
+			const counter = document.getElementById('connection-count')!;
+			counter.innerText = msg.connCount;
+		}
+	});
+</script>
