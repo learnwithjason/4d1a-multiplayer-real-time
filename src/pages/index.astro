@@ -11,9 +11,13 @@
 		<title>Astro</title>
 	</head>
 	<body>
-		<h1>Astro</h1>
+		<section id="hero">
+			<span class="connection-count">1</span>
+		</section>
 
-		<p>There are <span id="connection-count">1</span> connected users.</p>
+		<template id="thingy">
+			<div class="thingy"></div>
+		</template>
 	</body>
 </html>
 
@@ -21,20 +25,82 @@
 	import PartySocket from 'partysocket';
 
 	const partySocket = new PartySocket({
-		host: '4d1a-multiplayer-real-time.jlengstorf.partykit.dev',
+		host: 'localhost:1999',
 		room: '4d1a',
 	});
-
-	partySocket.send('test test');
-
-	// partySocket.
 
 	partySocket.addEventListener('message', (e) => {
 		const msg = JSON.parse(e.data);
 
-		if (msg.connCount) {
-			const counter = document.getElementById('connection-count')!;
-			counter.innerText = msg.connCount;
+		if (!msg.count) {
+			return;
+		}
+
+		const counter = document.querySelector('.connection-count') as HTMLElement;
+		const template = document.querySelector('#thingy') as HTMLTemplateElement;
+		const heroEl = document.querySelector('#hero');
+
+		counter.innerText = msg.count;
+
+		if (msg.type === 'join') {
+			console.log(msg.connections);
+			msg.connections.forEach((id: string) => {
+				const elExists = document.querySelector(`[data-id="${id}"]`);
+				console.log(elExists);
+
+				if (!elExists) {
+					const thingy = template.content.firstElementChild!.cloneNode(
+						true,
+					) as HTMLDivElement;
+					console.log('no element, creating');
+					thingy.dataset.id = id;
+					heroEl?.appendChild(thingy);
+				}
+			});
+		}
+
+		if (msg.type === 'leave') {
+			const toRemove = heroEl?.querySelector(`[data-id="${msg.id}"]`);
+			toRemove?.remove();
 		}
 	});
 </script>
+
+<style is:global>
+	* {
+		box-sizing: border-box;
+	}
+
+	html {
+		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+			Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+			'Segoe UI Symbol';
+	}
+
+	body {
+		margin: 0;
+	}
+</style>
+
+<style>
+	#hero {
+		display: flex;
+		place-content: center;
+		background: lightgrey;
+		height: 80dvh;
+		position: relative;
+	}
+
+	.connection-count {
+		position: absolute;
+		inset-block-start: 1rem;
+		inset-inline-end: 1rem;
+	}
+
+	.thingy {
+		display: block;
+		aspect-ratio: 1;
+		height: 1rem;
+		background-color: red;
+	}
+</style>
