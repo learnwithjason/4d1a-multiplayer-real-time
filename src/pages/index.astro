@@ -52,8 +52,11 @@
 					const thingy = template.content.firstElementChild!.cloneNode(
 						true,
 					) as HTMLDivElement;
-					console.log('no element, creating');
+
 					thingy.dataset.id = id;
+
+					const mixPercent = Math.min((msg.count / 10) * 100, 100) + '%';
+					thingy.style.setProperty('--color-mix-percent', mixPercent);
 					heroEl?.appendChild(thingy);
 				}
 			});
@@ -67,6 +70,14 @@
 </script>
 
 <style is:global>
+	:root {
+		--color-mix-percent: 0%;
+		--color-background: oklch(95.76% 0.0051 192.71);
+		--color-border: oklch(21.58% 0.037 192.71);
+		--color-calm: oklch(95.29% 0.074 192.71);
+		--color-energy: oklch(74.12% 0.195 22.24);
+	}
+
 	* {
 		box-sizing: border-box;
 	}
@@ -84,9 +95,11 @@
 
 <style>
 	#hero {
-		display: flex;
+		display: grid;
+		gap: 1rem;
+		grid-template-columns: repeat(auto-fit, 3rem);
 		place-content: center;
-		background: lightgrey;
+		background: var(--color-background);
 		height: 80dvh;
 		position: relative;
 	}
@@ -98,9 +111,15 @@
 	}
 
 	.thingy {
+		background-color: color-mix(
+			in oklch,
+			var(--color-calm),
+			var(--color-energy) var(--color-mix-percent)
+		);
+		border: 1px solid var(--color-border);
+		border-radius: 50%;
 		display: block;
 		aspect-ratio: 1;
-		height: 1rem;
-		background-color: red;
+		height: 3rem;
 	}
 </style>
