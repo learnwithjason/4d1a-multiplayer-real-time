@@ -25,7 +25,7 @@
 	import PartySocket from 'partysocket';
 
 	const partySocket = new PartySocket({
-		host: '4d1a-multiplayer-real-time.jlengstorf.partykit.dev',
+		host: import.meta.env.PUBLIC_PARTYKIT_URL,
 		room: '4d1a',
 	});
 
