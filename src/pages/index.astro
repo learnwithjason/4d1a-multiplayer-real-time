@@ -14,8 +14,32 @@
 		<section id="hero">
 			<span class="connection-count">1</span>
 
-			<button id="collab"> 0%</button>
-			<div id="unlock" class="hidden"></div>
+			<div id="locked-section">
+				<h1>Discounts are better with friends!</h1>
+				<p>
+					You and at least 3 friends (4 people or more) need to hold down the
+					treasure chest below at the same time on different devices to unlock
+					the discount.
+				</p>
+				<button id="collab">0%</button>
+			</div>
+
+			<div id="unlocked-section" class="hidden">
+				<h1>You did it!</h1>
+				<p>
+					This discount code will get you 50% off your purchase of a rubber
+					corgi duck in the Learn With Jason store.
+				</p>
+				<p>
+					<code>TESTCODE</code>
+				</p>
+				<p>
+					<a
+						href="https://learn-with-jason.myshopify.com/products/rainbow-corgi-toy"
+						target="_blank">claim your discount in the store</a
+					>
+				</p>
+			</div>
 		</section>
 
 		<pre id="debug"></pre>
@@ -154,8 +178,38 @@
 		syntax: '<time>';
 	}
 
+	@keyframes bump {
+		0% {
+			rotate: 0deg;
+		}
+		15% {
+			rotate: 2deg;
+			top: 2%;
+		}
+		40% {
+			rotate: -4deg;
+			top: -7%;
+		}
+		50% {
+			rotate: -2deg;
+			top: -9%;
+		}
+		80% {
+			rotate: -1deg;
+			top: -5%;
+		}
+		90% {
+			rotate: 1deg;
+			top: 2%;
+		}
+		100% {
+			rotate: 0deg;
+			top: 0;
+		}
+	}
+
 	#hero {
-		display: grid;
+		display: flex;
 		gap: 1rem;
 		grid-template-columns: repeat(auto-fit, 3rem);
 		place-content: center;
@@ -170,10 +224,39 @@
 		inset-inline-end: 1rem;
 	}
 
+	#locked-section,
+	#unlocked-section {
+		display: flex;
+		flex-direction: column;
+		margin: 2rem;
+		place-content: center;
+		text-align: center;
+		text-wrap: balance;
+
+		&.hidden {
+			display: none;
+		}
+
+		& h1 {
+			font-size: 2rem;
+			line-height: 1.1;
+			margin: 0;
+		}
+
+		& p {
+			margin-block: 1rem 0;
+		}
+
+		& code {
+			font-family: 'SF Mono', monospace;
+			font-size: 1.5rem;
+		}
+	}
+
 	#collab {
-		aspect-ratio: 1;
 		background:
-			linear-gradient(to bottom in oklch, oklch(0.9 0.025 0) 0 0) padding-box,
+			linear-gradient(to bottom in oklch, oklch(0.9 0.025 0 / 0.75) 0 0)
+				padding-box,
 			conic-gradient(
 					from 0deg in oklch,
 					oklch(0.85 0.37 0) 0%,
@@ -183,8 +266,28 @@
 				border-box;
 		border: 0.5rem solid transparent;
 		border-radius: 50%;
-		margin-block: auto;
+		display: block;
+		height: 100px;
+		margin: auto;
+		position: relative;
 		transition: --pct var(--speed) linear;
 		width: 100px;
+
+		&::after {
+			content: '';
+			background-image: url('https://res.cloudinary.com/jlengstorf/image/upload/f_auto,q_auto/v1704333347/4d1a/partykit-multiplayer/treasure-chest.png');
+			background-repeat: no-repeat;
+			background-size: contain;
+			inset: 0;
+			position: absolute;
+			z-index: 0;
+		}
+
+		&:active::after {
+			animation: bump 1s ease-in-out infinite;
+		}
+	}
+
+	#unlock {
 	}
 </style>
