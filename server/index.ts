@@ -1,30 +1,47 @@
 import type * as Party from 'partykit/server';
 
-export default class Server implements Party.Server {
-	count = 0;
-	connections = new Map();
-	maxEnergyLevel = 10;
+const MAX_AMOUNT_PER_PERSON = 25;
 
-	options: Party.ServerOptions = {
-		hibernate: true,
-	};
+export default class Server implements Party.Server {
+	unlocks = new Map();
+	connections = new Map();
+	count = 0;
+	// maxEnergyLevel = 10;
+
+	// options: Party.ServerOptions = {
+	// 	hibernate: true,
+	// };
 
 	constructor(readonly party: Party.Party) {}
 
 	onMessage(message: string, sender: Party.Connection) {
-		this.party.broadcast(message, [sender.id]);
+		const msg = JSON.parse(message);
+
+		if (msg.type === 'unlock') {
+			const currentPct = this.unlocks.get(sender.id);
+			const newPct = Math.max(
+				0,
+				Math.min(MAX_AMOUNT_PER_PERSON, currentPct + msg.amount),
+			);
+			this.unlocks.set(sender.id, newPct);
+		}
+
+		this.party.broadcast(
+			JSON.stringify({
+				...msg,
+				unlocks: [...this.unlocks.entries()],
+			}),
+		);
 	}
 
 	onConnect(connection: Party.Connection) {
-		const percent =
-			Math.min((this.connections.size / this.maxEnergyLevel) * 100, 100) + '%';
-		this.connections.set(connection.id, percent);
+		this.unlocks.set(connection.id, 0);
+		this.count = this.unlocks.size;
 
-		this.count = this.connections.size;
 		this.party.broadcast(
 			JSON.stringify({
 				count: this.count,
-				connections: [...this.connections.entries()],
+				unlocks: [...this.unlocks.entries()],
 				id: connection.id,
 				type: 'join',
 			}),
@@ -32,9 +49,9 @@ export default class Server implements Party.Server {
 	}
 
 	onClose(connection: Party.Connection) {
-		this.connections.delete(connection.id);
+		this.unlocks.delete(connection.id);
+		this.count = this.unlocks.size;
 
-		this.count = this.connections.size;
 		this.party.broadcast(
 			JSON.stringify({
 				count: this.count,

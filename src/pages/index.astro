@@ -13,11 +13,11 @@
 	<body>
 		<section id="hero">
 			<span class="connection-count">1</span>
+
+			<button id="collab"> 0%</button>
 		</section>
 
-		<template id="thingy">
-			<div class="thingy" transition:name="thingy"></div>
-		</template>
+		<pre id="debug"></pre>
 	</body>
 </html>
 
@@ -29,41 +29,72 @@
 		room: '4d1a',
 	});
 
+	const btn = document.getElementById('collab')!;
+	const debug = document.getElementById('debug')!;
+
+	const MAX_AMOUNT_PER_PERSON = 25;
+	const INTERVAL_SIZE = 5_000 / MAX_AMOUNT_PER_PERSON;
+
+	let holding: number;
+	let localAmount: number = 0;
+
+	btn.style.setProperty('--speed', `${INTERVAL_SIZE - 10}ms`);
+
+	function getAmountWithinBounds(amount: number) {
+		return Math.max(Math.min(amount, MAX_AMOUNT_PER_PERSON), 0);
+	}
+
+	function updatePropertyPct(amount: number) {
+		clearInterval(holding);
+
+		const interval = amount > 0 ? INTERVAL_SIZE : INTERVAL_SIZE * 2;
+
+		holding = setInterval(() => {
+			localAmount = getAmountWithinBounds(localAmount + amount);
+
+			if (
+				(localAmount === 0 && amount === -1) ||
+				(localAmount === MAX_AMOUNT_PER_PERSON && amount === 1)
+			) {
+				clearInterval(holding);
+			}
+
+			// tell other connected clients to update their own amounts
+			partySocket.send(
+				JSON.stringify({
+					type: 'unlock',
+					amount,
+				}),
+			);
+		}, interval);
+	}
+
+	btn.addEventListener('mousedown', () => {
+		updatePropertyPct(1);
+	});
+
+	btn.addEventListener('mouseup', (e) => {
+		updatePropertyPct(-1);
+	});
+
 	partySocket.addEventListener('message', (e) => {
+		const counter = document.querySelector('.connection-count') as HTMLElement;
 		const msg = JSON.parse(e.data);
 
-		if (!msg.count) {
-			return;
+		debug.innerText = JSON.stringify(msg, null, 2);
+
+		if (msg.type === 'unlock') {
+			let percent = 0;
+			for (const [_, pct] of msg.unlocks) {
+				percent += pct;
+			}
+
+			btn.style.setProperty('--pct', `${percent}%`);
+			btn.innerText = `${percent}%`;
 		}
 
-		const counter = document.querySelector('.connection-count') as HTMLElement;
-		const template = document.querySelector('#thingy') as HTMLTemplateElement;
-		const heroEl = document.querySelector('#hero');
-
-		counter.innerText = msg.count;
-
-		if (msg.type === 'join') {
-			msg.connections.forEach(
-				([id, percent]: [id: string, percent: string]) => {
-					const elExists = document.querySelector(`[data-id="${id}"]`);
-
-					if (!elExists) {
-						const thingy = template.content.firstElementChild!.cloneNode(
-							true,
-						) as HTMLDivElement;
-
-						thingy.dataset.id = id;
-
-						thingy.style.setProperty('--color-mix-percent', percent);
-						heroEl?.appendChild(thingy);
-					}
-				},
-			);
-		}
-
-		if (msg.type === 'leave') {
-			const toRemove = heroEl?.querySelector(`[data-id="${msg.id}"]`);
-			toRemove?.remove();
+		if (msg.count) {
+			counter.innerText = msg.count;
 		}
 	});
 </script>
@@ -93,6 +124,18 @@
 </style>
 
 <style>
+	@property --pct {
+		inherits: true;
+		initial-value: 0%;
+		syntax: '<percentage>';
+	}
+
+	@property --speed {
+		inherits: true;
+		initial-value: 200ms;
+		syntax: '<time>';
+	}
+
 	#hero {
 		display: grid;
 		gap: 1rem;
@@ -109,16 +152,21 @@
 		inset-inline-end: 1rem;
 	}
 
-	.thingy {
-		background-color: color-mix(
-			in oklch,
-			var(--color-calm),
-			var(--color-energy) var(--color-mix-percent)
-		);
-		border: 1px solid var(--color-border);
-		border-radius: 50%;
-		display: block;
+	#collab {
 		aspect-ratio: 1;
-		height: 3rem;
+		background:
+			linear-gradient(to bottom in oklch, oklch(0.9 0.025 0) 0 0) padding-box,
+			conic-gradient(
+					from 0deg in oklch,
+					oklch(0.85 0.37 0) 0%,
+					oklch(0.85 0.37 50) var(--pct),
+					oklch(0.85 0.37 50 / 0) var(--pct)
+				)
+				border-box;
+		border: 0.5rem solid transparent;
+		border-radius: 50%;
+		margin-block: auto;
+		transition: --pct var(--speed) linear;
+		width: 100px;
 	}
 </style>
