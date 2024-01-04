@@ -73,7 +73,17 @@
 		updatePropertyPct(1);
 	});
 
+	btn.addEventListener('touchstart', (e) => {
+		e.preventDefault();
+		updatePropertyPct(1);
+	});
+
 	btn.addEventListener('mouseup', (e) => {
+		updatePropertyPct(-1);
+	});
+
+	btn.addEventListener('touchend', (e) => {
+		e.preventDefault();
 		updatePropertyPct(-1);
 	});
 
