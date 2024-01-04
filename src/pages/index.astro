@@ -15,6 +15,7 @@
 			<span class="connection-count">1</span>
 
 			<button id="collab"> 0%</button>
+			<div id="unlock" class="hidden"></div>
 		</section>
 
 		<pre id="debug"></pre>
@@ -30,9 +31,10 @@
 	});
 
 	const btn = document.getElementById('collab')!;
+	const unlock = document.getElementById('unlock')!;
 	const debug = document.getElementById('debug')!;
 
-	const MAX_AMOUNT_PER_PERSON = 25;
+	const MAX_AMOUNT_PER_PERSON = 50;
 	const INTERVAL_SIZE = 5_000 / MAX_AMOUNT_PER_PERSON;
 
 	let holding: number;
@@ -62,7 +64,7 @@
 			// tell other connected clients to update their own amounts
 			partySocket.send(
 				JSON.stringify({
-					type: 'unlock',
+					type: 'button-hold',
 					amount,
 				}),
 			);
@@ -93,7 +95,7 @@
 
 		debug.innerText = JSON.stringify(msg, null, 2);
 
-		if (msg.type === 'unlock') {
+		if (msg.type === 'button-hold') {
 			let percent = 0;
 			for (const [_, pct] of msg.unlocks) {
 				percent += pct;
@@ -101,6 +103,12 @@
 
 			btn.style.setProperty('--pct', `${percent}%`);
 			btn.innerText = `${percent}%`;
+		}
+
+		if (msg.type === 'unlock') {
+			btn.classList.add('hidden');
+			unlock.classList.remove('hidden');
+			unlock.innerText = msg.code;
 		}
 
 		if (msg.count) {
