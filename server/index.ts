@@ -1,6 +1,6 @@
 import type * as Party from 'partykit/server';
 
-const MAX_AMOUNT_PER_PERSON = 50;
+const MAX_AMOUNT_PER_PERSON = 25;
 
 export default class Server implements Party.Server {
 	unlocks = new Map();
@@ -30,7 +30,7 @@ export default class Server implements Party.Server {
 				this.party.broadcast(
 					JSON.stringify({
 						type: 'unlock',
-						code: 'CORGIDUCK50',
+						code: 'PARTYKIT50',
 					}),
 				);
 			}

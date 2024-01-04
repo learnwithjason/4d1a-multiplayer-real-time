@@ -60,7 +60,7 @@
 	const discountCode = document.getElementById('discount-code')!;
 	// const debug = document.getElementById('debug')!;
 
-	const MAX_AMOUNT_PER_PERSON = 50;
+	const MAX_AMOUNT_PER_PERSON = 25;
 	const INTERVAL_SIZE = 5_000 / MAX_AMOUNT_PER_PERSON;
 
 	let holding: number;
@@ -216,7 +216,7 @@
 		grid-template-columns: repeat(auto-fit, 3rem);
 		place-content: center;
 		background: var(--color-background);
-		height: 80dvh;
+		height: 100dvh;
 		position: relative;
 	}
 
@@ -234,6 +234,7 @@
 		place-content: center;
 		text-align: center;
 		text-wrap: balance;
+		width: 65ch;
 
 		&.hidden {
 			display: none;
@@ -241,6 +242,7 @@
 
 		& h1 {
 			font-size: 2rem;
+			font-weight: 900;
 			line-height: 1.1;
 			margin: 0;
 		}
@@ -270,10 +272,16 @@
 		border-radius: 50%;
 		display: block;
 		height: 100px;
-		margin: auto;
+		margin-block-start: 2rem;
+		margin-inline: auto;
 		position: relative;
 		transition: --pct var(--speed) linear;
 		width: 100px;
+
+		@media (min-width: 500px) {
+			height: 200px;
+			width: 200px;
+		}
 
 		&::after {
 			content: '';
@@ -288,8 +296,5 @@
 		&:active::after {
 			animation: bump 1s ease-in-out infinite;
 		}
-	}
-
-	#unlock {
 	}
 </style>
