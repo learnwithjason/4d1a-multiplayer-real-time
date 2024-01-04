@@ -16,5 +16,8 @@
     "partykit": "^0.0.45",
     "partysocket": "^0.0.17",
     "typescript": "^5.3.3"
+  },
+  "devDependencies": {
+    "@types/canvas-confetti": "^1.6.4"
   }
 }
