@@ -31,7 +31,7 @@
 					corgi duck in the Learn With Jason store.
 				</p>
 				<p>
-					<code>TESTCODE</code>
+					<code id="discount-code"></code>
 				</p>
 				<p>
 					<a
@@ -54,8 +54,10 @@
 		room: '4d1a',
 	});
 
+	const lockedSection = document.getElementById('locked-section')!;
+	const unlockedSection = document.getElementById('unlocked-section')!;
 	const btn = document.getElementById('collab')!;
-	const unlock = document.getElementById('unlock')!;
+	const discountCode = document.getElementById('discount-code')!;
 	const debug = document.getElementById('debug')!;
 
 	const MAX_AMOUNT_PER_PERSON = 50;
@@ -130,9 +132,9 @@
 		}
 
 		if (msg.type === 'unlock') {
-			btn.classList.add('hidden');
-			unlock.classList.remove('hidden');
-			unlock.innerText = msg.code;
+			lockedSection.classList.add('hidden');
+			unlockedSection.classList.remove('hidden');
+			discountCode.innerText = msg.code;
 		}
 
 		if (msg.count) {
