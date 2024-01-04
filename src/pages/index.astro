@@ -48,6 +48,7 @@
 
 <script>
 	import PartySocket from 'partysocket';
+	import confetti from 'canvas-confetti';
 
 	const partySocket = new PartySocket({
 		host: import.meta.env.PUBLIC_PARTYKIT_URL,
@@ -65,6 +66,9 @@
 
 	let holding: number;
 	let localAmount: number = 0;
+
+	let canvas = document.createElement('canvas');
+	document.body.appendChild(canvas);
 
 	btn.style.setProperty('--speed', `${INTERVAL_SIZE - 10}ms`);
 
@@ -135,6 +139,10 @@
 			lockedSection.classList.add('hidden');
 			unlockedSection.classList.remove('hidden');
 			discountCode.innerText = msg.code;
+
+			confetti({
+				disableForReducedMotion: true,
+			});
 		}
 
 		if (msg.count) {
