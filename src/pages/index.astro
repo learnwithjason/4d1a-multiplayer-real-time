@@ -42,7 +42,7 @@
 			</div>
 		</section>
 
-		<pre id="debug"></pre>
+		<!-- <pre id="debug"></pre> -->
 	</body>
 </html>
 
@@ -58,7 +58,7 @@
 	const unlockedSection = document.getElementById('unlocked-section')!;
 	const btn = document.getElementById('collab')!;
 	const discountCode = document.getElementById('discount-code')!;
-	const debug = document.getElementById('debug')!;
+	// const debug = document.getElementById('debug')!;
 
 	const MAX_AMOUNT_PER_PERSON = 50;
 	const INTERVAL_SIZE = 5_000 / MAX_AMOUNT_PER_PERSON;
@@ -119,7 +119,7 @@
 		const counter = document.querySelector('.connection-count') as HTMLElement;
 		const msg = JSON.parse(e.data);
 
-		debug.innerText = JSON.stringify(msg, null, 2);
+		// debug.innerText = JSON.stringify(msg, null, 2);
 
 		if (msg.type === 'button-hold') {
 			let percent = 0;
